@@ -12,19 +12,19 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.tooling.preview.PreviewScreenSizes
+import com.pandutimurbhaskara.compose_media.ui.navigation.BottomNavBar
+import com.pandutimurbhaskara.compose_media.ui.navigation.NavBarItem
 import com.pandutimurbhaskara.compose_media.ui.theme.ComposemediaTheme
 
 class MainActivity : ComponentActivity() {
@@ -39,61 +39,68 @@ class MainActivity : ComponentActivity() {
 	}
 }
 
-@PreviewScreenSizes
 @Composable
 fun ComposemediaApp() {
-	var currentDestination by rememberSaveable { mutableStateOf(AppDestinations.HOME) }
+	// Navigation items
+	val navItems = remember {
+		listOf(
+			NavBarItem(
+				label = "Home",
+				icon = Icons.Default.Home,
+				route = "home"
+			),
+			NavBarItem(
+				label = "History",
+				icon = Icons.Default.DateRange,
+				route = "history"
+			),
+			NavBarItem(
+				label = "Setting",
+				icon = Icons.Default.Settings,
+				route = "settings"
+			)
+		)
+	}
 
-	NavigationSuiteScaffold(
-		navigationSuiteItems = {
-			AppDestinations.entries.forEach {
-				item(
-					icon = {
-						Icon(
-							it.icon,
-							contentDescription = it.label
-						)
-					},
-					label = { Text(it.label) },
-					selected = it == currentDestination,
-					onClick = { currentDestination = it }
+	// Store index instead of the entire NavBarItem (which contains non-saveable ImageVector)
+	var selectedIndex by rememberSaveable { mutableStateOf(0) }
+	val selectedItem = navItems[selectedIndex]
+
+	Scaffold(
+		modifier = Modifier.fillMaxSize(),
+		bottomBar = {
+			BottomNavBar(
+				items = navItems,
+				selectedItem = selectedItem,
+				onItemSelected = { item ->
+					selectedIndex = navItems.indexOf(item)
+				}
+			)
+		}
+	) { innerPadding ->
+		Box(
+			modifier = Modifier
+				.fillMaxSize()
+				.padding(innerPadding),
+			contentAlignment = Alignment.Center
+		) {
+			// Screen content based on selected item
+			when (selectedItem.route) {
+				"home" -> Text(
+					text = "Home Screen",
+					style = MaterialTheme.typography.headlineSmall
+				)
+				"history" -> Text(
+					text = "History Screen",
+					style = MaterialTheme.typography.headlineSmall
+				)
+				"settings" -> Text(
+					text = "Setting Screen",
+					style = MaterialTheme.typography.headlineSmall
 				)
 			}
 		}
-	) {
-		Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-			Box(
-				modifier = Modifier
-					.fillMaxSize()
-					.padding(innerPadding),
-				contentAlignment = Alignment.Center
-			) {
-				when (currentDestination) {
-					AppDestinations.HOME -> Text(
-						text = "${currentDestination.label} Screen",
-						style = androidx.compose.material3.MaterialTheme.typography.headlineSmall
-					)
-					AppDestinations.HISTORY -> Text(
-						text = "${currentDestination.label} Screen",
-						style = androidx.compose.material3.MaterialTheme.typography.headlineSmall
-					)
-					AppDestinations.SETTINGS -> Text(
-						text = "${currentDestination.label} Screen",
-						style = androidx.compose.material3.MaterialTheme.typography.headlineSmall
-					)
-				}
-			}
-		}
 	}
-}
-
-enum class AppDestinations(
-	val label: String,
-	val icon: ImageVector,
-) {
-	HOME("Home", Icons.Default.Home),
-	HISTORY("History", Icons.Default.DateRange),
-	SETTINGS("Setting", Icons.Default.Settings),
 }
 
 @Preview(showBackground = true, name = "Light Theme")
