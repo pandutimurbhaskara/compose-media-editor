@@ -4,12 +4,14 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.ui.Alignment
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountBox
-import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -60,10 +62,27 @@ fun ComposemediaApp() {
 		}
 	) {
 		Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-			Greeting(
-				name = currentDestination.label,
-				modifier = Modifier.padding(innerPadding)
-			)
+			Box(
+				modifier = Modifier
+					.fillMaxSize()
+					.padding(innerPadding),
+				contentAlignment = Alignment.Center
+			) {
+				when (currentDestination) {
+					AppDestinations.HOME -> Text(
+						text = "${currentDestination.label} Screen",
+						style = androidx.compose.material3.MaterialTheme.typography.headlineSmall
+					)
+					AppDestinations.HISTORY -> Text(
+						text = "${currentDestination.label} Screen",
+						style = androidx.compose.material3.MaterialTheme.typography.headlineSmall
+					)
+					AppDestinations.SETTINGS -> Text(
+						text = "${currentDestination.label} Screen",
+						style = androidx.compose.material3.MaterialTheme.typography.headlineSmall
+					)
+				}
+			}
 		}
 	}
 }
@@ -73,22 +92,22 @@ enum class AppDestinations(
 	val icon: ImageVector,
 ) {
 	HOME("Home", Icons.Default.Home),
-	FAVORITES("Favorites", Icons.Default.Favorite),
-	PROFILE("Profile", Icons.Default.AccountBox),
+	HISTORY("History", Icons.Default.DateRange),
+	SETTINGS("Setting", Icons.Default.Settings),
 }
 
+@Preview(showBackground = true, name = "Light Theme")
 @Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-	Text(
-		text = "Hello $name!",
-		modifier = modifier
-	)
+fun AppPreviewLight() {
+	ComposemediaTheme(darkTheme = false) {
+		ComposemediaApp()
+	}
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, name = "Dark Theme")
 @Composable
-fun GreetingPreview() {
-	ComposemediaTheme {
-		Greeting("Android")
+fun AppPreviewDark() {
+	ComposemediaTheme(darkTheme = true) {
+		ComposemediaApp()
 	}
 }

@@ -12,32 +12,40 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 
 private val DarkColorScheme = darkColorScheme(
-	primary = Purple80,
-	secondary = PurpleGrey80,
-	tertiary = Pink80
+	primary = DarkPrimary,
+	onPrimary = DarkOnPrimary,
+	primaryContainer = DarkPrimaryContainer,
+	onPrimaryContainer = DarkOnPrimaryContainer,
+	secondary = DarkSecondary,
+	onSecondary = DarkOnSecondary,
+	secondaryContainer = DarkSecondaryContainer,
+	onSecondaryContainer = DarkOnSecondaryContainer,
+	background = DarkBackground,
+	onBackground = DarkOnBackground,
+	surface = DarkSurface,
+	onSurface = DarkOnSurface
 )
 
 private val LightColorScheme = lightColorScheme(
-	primary = Purple40,
-	secondary = PurpleGrey40,
-	tertiary = Pink40
-
-	/* Other default colors to override
-    background = Color(0xFFFFFBFE),
-    surface = Color(0xFFFFFBFE),
-    onPrimary = Color.White,
-    onSecondary = Color.White,
-    onTertiary = Color.White,
-    onBackground = Color(0xFF1C1B1F),
-    onSurface = Color(0xFF1C1B1F),
-    */
+	primary = LightPrimary,
+	onPrimary = LightOnPrimary,
+	primaryContainer = LightPrimaryContainer,
+	onPrimaryContainer = LightOnPrimaryContainer,
+	secondary = LightSecondary,
+	onSecondary = LightOnSecondary,
+	secondaryContainer = LightSecondaryContainer,
+	onSecondaryContainer = LightOnSecondaryContainer,
+	background = LightBackground,
+	onBackground = LightOnBackground,
+	surface = LightSurface,
+	onSurface = LightOnSurface
 )
 
 @Composable
 fun ComposemediaTheme(
 	darkTheme: Boolean = isSystemInDarkTheme(),
-	// Dynamic color is available on Android 12+
-	dynamicColor: Boolean = true,
+	// Dynamic color disabled by default to use custom Indigo theme
+	dynamicColor: Boolean = false,
 	content: @Composable () -> Unit
 ) {
 	val colorScheme = when {
