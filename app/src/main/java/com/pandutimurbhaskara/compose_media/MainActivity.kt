@@ -4,17 +4,13 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.ui.Alignment
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -25,6 +21,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.pandutimurbhaskara.compose_media.ui.navigation.BottomNavBar
 import com.pandutimurbhaskara.compose_media.ui.navigation.NavBarItem
+import com.pandutimurbhaskara.compose_media.ui.screens.HistoryScreen
+import com.pandutimurbhaskara.compose_media.ui.screens.HomeScreen
+import com.pandutimurbhaskara.compose_media.ui.screens.SettingsScreen
 import com.pandutimurbhaskara.compose_media.ui.theme.ComposemediaTheme
 
 class MainActivity : ComponentActivity() {
@@ -78,27 +77,23 @@ fun ComposemediaApp() {
 			)
 		}
 	) { innerPadding ->
-		Box(
-			modifier = Modifier
-				.fillMaxSize()
-				.padding(innerPadding),
-			contentAlignment = Alignment.Center
-		) {
-			// Screen content based on selected item
-			when (selectedItem.route) {
-				"home" -> Text(
-					text = "Home Screen",
-					style = MaterialTheme.typography.headlineSmall
-				)
-				"history" -> Text(
-					text = "History Screen",
-					style = MaterialTheme.typography.headlineSmall
-				)
-				"settings" -> Text(
-					text = "Setting Screen",
-					style = MaterialTheme.typography.headlineSmall
-				)
-			}
+		// Screen content based on selected item
+		when (selectedItem.route) {
+			"home" -> HomeScreen(
+				modifier = Modifier
+					.fillMaxSize()
+					.padding(innerPadding)
+			)
+			"history" -> HistoryScreen(
+				modifier = Modifier
+					.fillMaxSize()
+					.padding(innerPadding)
+			)
+			"settings" -> SettingsScreen(
+				modifier = Modifier
+					.fillMaxSize()
+					.padding(innerPadding)
+			)
 		}
 	}
 }
