@@ -73,6 +73,10 @@ fun HistoryScreen(
 	// Filter state
 	var selectedFilter by rememberSaveable { mutableStateOf(ProjectFilter.ALL) }
 
+	// Dialog state
+	var selectedProject by remember { mutableStateOf<HistoryProject?>(null) }
+	var showDraftDialog by remember { mutableStateOf(false) }
+
 	Column(
 		modifier = modifier.fillMaxSize()
 	) {
@@ -104,11 +108,33 @@ fun HistoryScreen(
 		} else {
 			ProjectList(
 				projects = filteredProjects,
-				onProjectClick = onProjectClick,
+				onProjectClick = { project ->
+					selectedProject = project
+					showDraftDialog = true
+					onProjectClick(project)
+				},
 				onMoreOptionsClick = onMoreOptionsClick,
 				modifier = Modifier.fillMaxSize()
 			)
 		}
+	}
+
+	// Draft View Dialog
+	if (showDraftDialog && selectedProject != null) {
+		DraftViewDialog(
+			project = selectedProject!!,
+			onResume = {
+				showDraftDialog = false
+				// Mock resume editing
+			},
+			onDelete = {
+				showDraftDialog = false
+				// Mock delete
+			},
+			onDismiss = {
+				showDraftDialog = false
+			}
+		)
 	}
 }
 
@@ -359,6 +385,67 @@ private fun StatusBadge(
 			modifier = Modifier.padding(horizontal = Spacing.small, vertical = 4.dp)
 		)
 	}
+}
+
+/**
+ * Draft view dialog
+ */
+@Composable
+private fun DraftViewDialog(
+	project: HistoryProject,
+	onResume: () -> Unit,
+	onDelete: () -> Unit,
+	onDismiss: () -> Unit
+) {
+	androidx.compose.material3.AlertDialog(
+		onDismissRequest = onDismiss,
+		title = {
+			Text(
+				text = stringResource(R.string.dialog_draft_view_title),
+				style = MaterialTheme.typography.titleLarge
+			)
+		},
+		text = {
+			Column(
+				horizontalAlignment = Alignment.CenterHorizontally,
+				verticalArrangement = Arrangement.spacedBy(Spacing.medium)
+			) {
+				// Project thumbnail
+				ProjectThumbnail(
+					modifier = Modifier.size(120.dp)
+				)
+
+				// Filename
+				Text(
+					text = project.filename,
+					style = MaterialTheme.typography.bodyLarge.copy(
+						fontWeight = FontWeight.Bold
+					),
+					color = MaterialTheme.colorScheme.onSurface
+				)
+
+				// Status badge
+				StatusBadge(status = project.status)
+
+				// Timestamp
+				Text(
+					text = project.timestamp,
+					style = MaterialTheme.typography.bodySmall,
+					color = MaterialTheme.colorScheme.onSurfaceVariant
+				)
+			}
+		},
+		confirmButton = {
+			Button(onClick = onResume) {
+				Text(stringResource(R.string.dialog_draft_view_resume))
+			}
+		},
+		dismissButton = {
+			androidx.compose.material3.TextButton(onClick = onDelete) {
+				Text(stringResource(R.string.dialog_draft_view_delete))
+			}
+		}
+	)
 }
 
 /**

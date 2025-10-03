@@ -14,16 +14,20 @@ import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import kotlinx.coroutines.launch
 import androidx.compose.ui.tooling.preview.Preview
 import com.pandutimurbhaskara.compose_media.ui.navigation.BottomNavBar
 import com.pandutimurbhaskara.compose_media.ui.navigation.NavBarItem
@@ -117,8 +121,31 @@ fun ComposemediaApp(
 	var selectedIndex by rememberSaveable { mutableStateOf(0) }
 	val selectedItem = navItems[selectedIndex]
 
+	// Snackbar state
+	val snackbarHostState = remember { SnackbarHostState() }
+	val scope = rememberCoroutineScope()
+
+	// Navigation helper function
+	val navigateToTab = { route: String ->
+		val index = navItems.indexOfFirst { it.route == route }
+		if (index >= 0) {
+			selectedIndex = index
+		}
+	}
+
+	// Show snackbar helper function
+	val showSnackbar: (String) -> Unit = { message ->
+		scope.launch {
+			snackbarHostState.showSnackbar(message)
+		}
+		Unit
+	}
+
 	Scaffold(
 		modifier = Modifier.fillMaxSize(),
+		snackbarHost = {
+			SnackbarHost(hostState = snackbarHostState)
+		},
 		bottomBar = {
 			BottomNavBar(
 				items = navItems,
@@ -131,22 +158,44 @@ fun ComposemediaApp(
 	) { innerPadding ->
 		// Screen content based on selected item
 		when (selectedItem.route) {
-			"home" -> HomeScreen(
-				modifier = Modifier
-					.fillMaxSize()
-					.padding(innerPadding)
-			)
+			"home" -> {
+				val context = LocalContext.current
+				HomeScreen(
+					modifier = Modifier
+						.fillMaxSize()
+						.padding(innerPadding),
+					onEditingOptionClick = { option ->
+						// Show snackbar with option label
+						val message = context.getString(
+							when (option.type) {
+								com.pandutimurbhaskara.compose_media.ui.screens.EditingType.PHOTO ->
+									R.string.snackbar_opening_photo_editor
+								com.pandutimurbhaskara.compose_media.ui.screens.EditingType.VIDEO ->
+									R.string.snackbar_opening_video_editor
+							}
+						)
+						showSnackbar(message)
+						// Navigate to history after a short delay
+						navigateToTab("history")
+					}
+				)
+			}
 			"history" -> HistoryScreen(
 				modifier = Modifier
 					.fillMaxSize()
-					.padding(innerPadding)
+					.padding(innerPadding),
+				onStartEditingClick = {
+					// Navigate to home when start editing is clicked
+					navigateToTab("home")
+				}
 			)
 			"settings" -> SettingsScreen(
 				modifier = Modifier
 					.fillMaxSize()
 					.padding(innerPadding),
 				onThemeChanged = onThemeChanged,
-				onLanguageChanged = onLanguageChanged
+				onLanguageChanged = onLanguageChanged,
+				onShowSnackbar = showSnackbar
 			)
 		}
 	}

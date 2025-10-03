@@ -54,6 +54,15 @@
     <string name="dialog_clear_cache_title">Hapus Cache?</string>
     <string name="dialog_clear_cache_message">Ini akan menghapus 42.3 MB data cache. Aplikasi mungkin akan memuat lebih lama di lain waktu.</string>
     <string name="dialog_clear_cache_confirm">Hapus</string>
+    <string name="dialog_draft_view_title">Tampilan Draf</string>
+    <string name="dialog_draft_view_resume">Lanjutkan Mengedit</string>
+    <string name="dialog_draft_view_delete">Hapus</string>
+
+    <!-- Snackbar Messages -->
+    <string name="snackbar_opening_photo_editor">Membuka editor foto…</string>
+    <string name="snackbar_opening_video_editor">Membuka editor video…</string>
+    <string name="snackbar_cache_cleared">Cache berhasil dihapus</string>
+    <string name="snackbar_draft_deleted">Draf dihapus</string>
 
     <!-- Common -->
     <string name="content_desc_expand">Perluas</string>

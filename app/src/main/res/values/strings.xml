@@ -54,6 +54,15 @@
     <string name="dialog_clear_cache_title">Clear Cache?</string>
     <string name="dialog_clear_cache_message">This will delete 42.3 MB of cached data. The app may take longer to load next time.</string>
     <string name="dialog_clear_cache_confirm">Clear</string>
+    <string name="dialog_draft_view_title">Draft View</string>
+    <string name="dialog_draft_view_resume">Resume Editing</string>
+    <string name="dialog_draft_view_delete">Delete</string>
+
+    <!-- Snackbar Messages -->
+    <string name="snackbar_opening_photo_editor">Opening photo editor…</string>
+    <string name="snackbar_opening_video_editor">Opening video editor…</string>
+    <string name="snackbar_cache_cleared">Cache cleared successfully</string>
+    <string name="snackbar_draft_deleted">Draft deleted</string>
 
     <!-- Common -->
     <string name="content_desc_expand">Expand</string>

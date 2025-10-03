@@ -67,7 +67,8 @@ fun SettingsScreen(
 	onThemeChanged: (Int) -> Unit = {},
 	onLanguageChanged: (String) -> Unit = {},
 	onPrivacyPolicyClick: () -> Unit = {},
-	onTermsClick: () -> Unit = {}
+	onTermsClick: () -> Unit = {},
+	onShowSnackbar: (String) -> Unit = {}
 ) {
 	val context = LocalContext.current
 	val prefs = remember { AppPreferences(context) }
@@ -221,7 +222,8 @@ fun SettingsScreen(
 		ClearCacheDialog(
 			onConfirm = {
 				showClearCacheDialog = false
-				// TODO: Implement cache clearing
+				// Show success snackbar
+				onShowSnackbar(context.getString(R.string.snackbar_cache_cleared))
 			},
 			onDismiss = { showClearCacheDialog = false }
 		)
