@@ -47,9 +47,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.pandutimurbhaskara.compose_media.R
 import com.pandutimurbhaskara.compose_media.ui.theme.ComposemediaTheme
 import com.pandutimurbhaskara.compose_media.ui.theme.Dimensions
 import com.pandutimurbhaskara.compose_media.ui.theme.Spacing
@@ -129,7 +131,7 @@ private fun HistoryHeader(
 			verticalAlignment = Alignment.CenterVertically
 		) {
 			Text(
-				text = "Recent Edits",
+				text = stringResource(R.string.history_title),
 				style = MaterialTheme.typography.headlineSmall.copy(
 					fontSize = 24.sp
 				),
@@ -139,7 +141,7 @@ private fun HistoryHeader(
 			IconButton(onClick = { /* Filter options */ }) {
 				Icon(
 					imageVector = Icons.Default.Settings,
-					contentDescription = "Filter",
+					contentDescription = stringResource(R.string.content_desc_filter),
 					tint = MaterialTheme.colorScheme.onSurfaceVariant
 				)
 			}
@@ -163,12 +165,20 @@ private fun FilterChipRow(
 		contentPadding = PaddingValues(horizontal = Spacing.small)
 	) {
 		items(ProjectFilter.values()) { filter ->
+			val filterLabel = stringResource(
+				when (filter) {
+					ProjectFilter.ALL -> R.string.history_filter_all
+					ProjectFilter.DRAFTS -> R.string.history_filter_drafts
+					ProjectFilter.COMPLETED -> R.string.history_filter_completed
+					ProjectFilter.EXPORTED -> R.string.history_filter_exported
+				}
+			)
 			FilterChip(
 				selected = selectedFilter == filter,
 				onClick = { onFilterSelected(filter) },
 				label = {
 					Text(
-						text = filter.label,
+						text = filterLabel,
 						style = MaterialTheme.typography.labelLarge
 					)
 				},
@@ -280,7 +290,7 @@ private fun ProjectCard(
 			) {
 				Icon(
 					imageVector = Icons.Default.MoreVert,
-					contentDescription = "More options",
+					contentDescription = stringResource(R.string.content_desc_more_options),
 					tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
 				)
 			}
@@ -303,7 +313,7 @@ private fun ProjectThumbnail(
 	) {
 		Icon(
 			imageVector = Icons.Default.Info,
-			contentDescription = "Thumbnail",
+			contentDescription = stringResource(R.string.content_desc_thumbnail),
 			tint = MaterialTheme.colorScheme.onPrimaryContainer,
 			modifier = Modifier.size(40.dp)
 		)
@@ -325,13 +335,22 @@ private fun StatusBadge(
 		ProjectStatus.FAILED -> StatusFailed
 	}
 
+	val statusLabel = stringResource(
+		when (status) {
+			ProjectStatus.DRAFT -> R.string.history_status_draft
+			ProjectStatus.COMPLETED -> R.string.history_status_completed
+			ProjectStatus.EXPORTED -> R.string.history_status_exported
+			ProjectStatus.FAILED -> R.string.history_status_failed
+		}
+	)
+
 	Surface(
 		modifier = modifier,
 		shape = RoundedCornerShape(12.dp),
 		color = backgroundColor
 	) {
 		Text(
-			text = status.label,
+			text = statusLabel,
 			style = MaterialTheme.typography.labelSmall.copy(
 				fontSize = 12.sp,
 				fontWeight = FontWeight.Medium
@@ -366,13 +385,13 @@ private fun EmptyState(
 			)
 
 			Text(
-				text = "No edits yet",
+				text = stringResource(R.string.history_empty_title),
 				style = MaterialTheme.typography.titleLarge,
 				color = MaterialTheme.colorScheme.onSurface
 			)
 
 			Text(
-				text = "Start editing to see your history here",
+				text = stringResource(R.string.history_empty_subtitle),
 				style = MaterialTheme.typography.bodyMedium,
 				color = MaterialTheme.colorScheme.onSurfaceVariant
 			)
@@ -389,7 +408,7 @@ private fun EmptyState(
 					modifier = Modifier.size(Dimensions.iconSmall)
 				)
 				Spacer(modifier = Modifier.width(Spacing.small))
-				Text("Start Editing")
+				Text(stringResource(R.string.history_start_editing))
 			}
 		}
 	}
@@ -398,21 +417,21 @@ private fun EmptyState(
 /**
  * Project status enum
  */
-enum class ProjectStatus(val label: String) {
-	DRAFT("Draft"),
-	COMPLETED("Completed"),
-	EXPORTED("Exported"),
-	FAILED("Failed")
+enum class ProjectStatus {
+	DRAFT,
+	COMPLETED,
+	EXPORTED,
+	FAILED
 }
 
 /**
  * Filter options enum
  */
-enum class ProjectFilter(val label: String) {
-	ALL("All"),
-	DRAFTS("Drafts"),
-	COMPLETED("Completed"),
-	EXPORTED("Exported")
+enum class ProjectFilter {
+	ALL,
+	DRAFTS,
+	COMPLETED,
+	EXPORTED
 }
 
 /**

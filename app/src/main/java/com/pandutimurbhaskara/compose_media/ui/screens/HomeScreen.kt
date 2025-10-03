@@ -46,9 +46,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.pandutimurbhaskara.compose_media.R
 import com.pandutimurbhaskara.compose_media.ui.theme.ComposemediaTheme
 import com.pandutimurbhaskara.compose_media.ui.theme.Dimensions
 import com.pandutimurbhaskara.compose_media.ui.theme.Spacing
@@ -74,24 +76,24 @@ fun HomeScreen(
 
 		// Photo Editing Accordion
 		EditingAccordion(
-			title = "Photo Editing",
+			title = stringResource(R.string.home_photo_editing),
 			isExpanded = expandedAccordion == "photo",
 			onToggle = {
 				expandedAccordion = if (expandedAccordion == "photo") null else "photo"
 			},
-			options = photoEditingOptions,
+			options = getPhotoEditingOptions(),
 			onOptionClick = onEditingOptionClick,
 			modifier = Modifier.padding(horizontal = Spacing.medium, vertical = Spacing.small)
 		)
 
 		// Video Editing Accordion
 		EditingAccordion(
-			title = "Video Editing",
+			title = stringResource(R.string.home_video_editing),
 			isExpanded = expandedAccordion == "video",
 			onToggle = {
 				expandedAccordion = if (expandedAccordion == "video") null else "video"
 			},
-			options = videoEditingOptions,
+			options = getVideoEditingOptions(),
 			onOptionClick = onEditingOptionClick,
 			modifier = Modifier.padding(horizontal = Spacing.medium, vertical = Spacing.small)
 		)
@@ -110,7 +112,7 @@ private fun HomeHeader(
 		color = MaterialTheme.colorScheme.surface
 	) {
 		Text(
-			text = "Privacy Editor",
+			text = stringResource(R.string.home_title),
 			style = MaterialTheme.typography.headlineSmall.copy(
 				fontSize = 24.sp
 			),
@@ -171,7 +173,11 @@ private fun EditingAccordion(
 
 				Icon(
 					imageVector = Icons.Default.KeyboardArrowDown,
-					contentDescription = if (isExpanded) "Collapse" else "Expand",
+					contentDescription = if (isExpanded) {
+						stringResource(R.string.content_desc_collapse)
+					} else {
+						stringResource(R.string.content_desc_expand)
+					},
 					tint = MaterialTheme.colorScheme.onSurfaceVariant,
 					modifier = Modifier
 						.size(Dimensions.iconMedium)
@@ -268,58 +274,60 @@ enum class EditingType {
 	PHOTO, VIDEO
 }
 
-// Photo editing options
-private val photoEditingOptions = listOf(
+// Photo editing options - using composable to access string resources
+@Composable
+private fun getPhotoEditingOptions() = listOf(
 	EditingOption(
 		id = "photo_blur_face",
-		label = "Blur Face",
+		label = stringResource(R.string.home_blur_face),
 		icon = Icons.Default.Face,
 		type = EditingType.PHOTO
 	),
 	EditingOption(
 		id = "photo_blur_plate",
-		label = "Blur License Plate",
+		label = stringResource(R.string.home_blur_license),
 		icon = Icons.Default.Check,
 		type = EditingType.PHOTO
 	),
 	EditingOption(
 		id = "photo_blur_id",
-		label = "Blur ID Card",
+		label = stringResource(R.string.home_blur_id),
 		icon = Icons.Default.AccountBox,
 		type = EditingType.PHOTO
 	),
 	EditingOption(
 		id = "photo_custom_blur",
-		label = "Custom Blur Area",
+		label = stringResource(R.string.home_custom_blur),
 		icon = Icons.Default.Check,
 		type = EditingType.PHOTO
 	)
 )
 
-// Video editing options
-private val videoEditingOptions = listOf(
+// Video editing options - using composable to access string resources
+@Composable
+private fun getVideoEditingOptions() = listOf(
 	EditingOption(
 		id = "video_blur_face",
-		label = "Blur Face",
+		label = stringResource(R.string.home_blur_face),
 		icon = Icons.Default.Face,
 		type = EditingType.VIDEO
 	),
 	EditingOption(
 		id = "video_blur_plate",
-		label = "Blur License Plate",
-		icon = Icons.Default.Check, // Using Check as placeholder for car icon
+		label = stringResource(R.string.home_blur_license),
+		icon = Icons.Default.Check,
 		type = EditingType.VIDEO
 	),
 	EditingOption(
 		id = "video_blur_id",
-		label = "Blur ID Card",
+		label = stringResource(R.string.home_blur_id),
 		icon = Icons.Default.AccountBox,
 		type = EditingType.VIDEO
 	),
 	EditingOption(
 		id = "video_custom_blur",
-		label = "Custom Blur Area",
-		icon = Icons.Default.Check, // Using Check as placeholder for crop icon
+		label = stringResource(R.string.home_custom_blur),
+		icon = Icons.Default.Check,
 		type = EditingType.VIDEO
 	)
 )

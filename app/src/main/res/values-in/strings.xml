@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- App Name -->
+    <string name="app_name">Editor Privasi</string>
+
+    <!-- Navigation -->
+    <string name="nav_home">Beranda</string>
+    <string name="nav_history">Riwayat</string>
+    <string name="nav_settings">Pengaturan</string>
+
+    <!-- Home Screen -->
+    <string name="home_title">Editor Privasi</string>
+    <string name="home_photo_editing">Edit Foto</string>
+    <string name="home_video_editing">Edit Video</string>
+    <string name="home_blur_face">Blur Wajah</string>
+    <string name="home_blur_license">Blur Plat Nomor</string>
+    <string name="home_blur_id">Blur Kartu Identitas</string>
+    <string name="home_custom_blur">Area Blur Kustom</string>
+
+    <!-- History Screen -->
+    <string name="history_title">Editan Terbaru</string>
+    <string name="history_filter_all">Semua</string>
+    <string name="history_filter_drafts">Draf</string>
+    <string name="history_filter_completed">Selesai</string>
+    <string name="history_filter_exported">Diekspor</string>
+    <string name="history_status_draft">Draf</string>
+    <string name="history_status_completed">Selesai</string>
+    <string name="history_status_exported">Diekspor</string>
+    <string name="history_status_failed">Gagal</string>
+    <string name="history_empty_title">Belum ada editan</string>
+    <string name="history_empty_subtitle">Mulai mengedit untuk melihat riwayat di sini</string>
+    <string name="history_start_editing">Mulai Mengedit</string>
+
+    <!-- Settings Screen -->
+    <string name="settings_title">Pengaturan</string>
+    <string name="settings_appearance">Tampilan</string>
+    <string name="settings_theme_system">Sistem</string>
+    <string name="settings_theme_light">Terang</string>
+    <string name="settings_theme_dark">Gelap</string>
+    <string name="settings_language_region">Bahasa &amp; Regional</string>
+    <string name="settings_language">Bahasa</string>
+    <string name="settings_about">Tentang</string>
+    <string name="settings_version">Versi</string>
+    <string name="settings_storage">Penyimpanan Terpakai</string>
+    <string name="settings_clear_cache">Hapus Cache</string>
+    <string name="settings_privacy_policy">Kebijakan Privasi</string>
+    <string name="settings_terms">Syarat Layanan</string>
+
+    <!-- Dialogs -->
+    <string name="dialog_language_title">Pilih Bahasa</string>
+    <string name="dialog_language_english">English</string>
+    <string name="dialog_language_indonesian">Bahasa Indonesia</string>
+    <string name="dialog_cancel">Batal</string>
+    <string name="dialog_clear_cache_title">Hapus Cache?</string>
+    <string name="dialog_clear_cache_message">Ini akan menghapus 42.3 MB data cache. Aplikasi mungkin akan memuat lebih lama di lain waktu.</string>
+    <string name="dialog_clear_cache_confirm">Hapus</string>
+
+    <!-- Common -->
+    <string name="content_desc_expand">Perluas</string>
+    <string name="content_desc_collapse">Ciutkan</string>
+    <string name="content_desc_open">Buka</string>
+    <string name="content_desc_filter">Filter</string>
+    <string name="content_desc_more_options">Opsi lainnya</string>
+    <string name="content_desc_thumbnail">Gambar kecil</string>
+</resources>

@@ -46,10 +46,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.pandutimurbhaskara.compose_media.AppPreferences
+import com.pandutimurbhaskara.compose_media.R
 import com.pandutimurbhaskara.compose_media.ui.theme.ComposemediaTheme
 import com.pandutimurbhaskara.compose_media.ui.theme.Dimensions
 import com.pandutimurbhaskara.compose_media.ui.theme.Spacing
@@ -60,14 +64,38 @@ import com.pandutimurbhaskara.compose_media.ui.theme.Spacing
 @Composable
 fun SettingsScreen(
 	modifier: Modifier = Modifier,
+	onThemeChanged: (Int) -> Unit = {},
+	onLanguageChanged: (String) -> Unit = {},
 	onPrivacyPolicyClick: () -> Unit = {},
 	onTermsClick: () -> Unit = {}
 ) {
+	val context = LocalContext.current
+	val prefs = remember { AppPreferences(context) }
+
+	// Load saved preferences
+	val savedTheme = prefs.getThemeMode()
+	val savedLanguage = prefs.getLanguage()
+
 	// Theme selection state
-	var selectedTheme by rememberSaveable { mutableStateOf(ThemeMode.SYSTEM) }
+	var selectedTheme by remember {
+		mutableStateOf(
+			when (savedTheme) {
+				AppPreferences.THEME_LIGHT -> ThemeMode.LIGHT
+				AppPreferences.THEME_DARK -> ThemeMode.DARK
+				else -> ThemeMode.SYSTEM
+			}
+		)
+	}
 
 	// Language selection state
-	var selectedLanguage by rememberSaveable { mutableStateOf(Language.ENGLISH) }
+	var selectedLanguage by remember {
+		mutableStateOf(
+			when (savedLanguage) {
+				AppPreferences.LANG_INDONESIAN -> Language.INDONESIAN
+				else -> Language.ENGLISH
+			}
+		)
+	}
 	var showLanguageDialog by remember { mutableStateOf(false) }
 
 	// Clear cache dialog state
@@ -82,20 +110,29 @@ fun SettingsScreen(
 		SettingsHeader()
 
 		// Appearance Section
-		SettingsSection(title = "Appearance") {
+		SettingsSection(title = stringResource(R.string.settings_appearance)) {
 			ThemeSelector(
 				selectedTheme = selectedTheme,
-				onThemeSelected = { selectedTheme = it }
+				onThemeSelected = { newTheme ->
+					selectedTheme = newTheme
+					// Call the callback to actually change the theme
+					val themeInt = when (newTheme) {
+						ThemeMode.LIGHT -> AppPreferences.THEME_LIGHT
+						ThemeMode.DARK -> AppPreferences.THEME_DARK
+						ThemeMode.SYSTEM -> AppPreferences.THEME_SYSTEM
+					}
+					onThemeChanged(themeInt)
+				}
 			)
 		}
 
 		HorizontalDivider(modifier = Modifier.padding(vertical = Spacing.medium))
 
 		// Language & Region Section
-		SettingsSection(title = "Language & Region") {
+		SettingsSection(title = stringResource(R.string.settings_language_region)) {
 			SettingItem(
 				icon = Icons.Default.Settings,
-				title = "Language",
+				title = stringResource(R.string.settings_language),
 				value = selectedLanguage.displayName,
 				onClick = { showLanguageDialog = true },
 				showChevron = true
@@ -105,11 +142,11 @@ fun SettingsScreen(
 		HorizontalDivider(modifier = Modifier.padding(vertical = Spacing.medium))
 
 		// About Section
-		SettingsSection(title = "About") {
+		SettingsSection(title = stringResource(R.string.settings_about)) {
 			// App Version
 			SettingItem(
 				icon = Icons.Default.Phone,
-				title = "Version",
+				title = stringResource(R.string.settings_version),
 				value = "1.0.0",
 				onClick = null,
 				showChevron = false
@@ -120,7 +157,7 @@ fun SettingsScreen(
 			// Storage Used
 			SettingItem(
 				icon = Icons.Default.Delete,
-				title = "Storage Used",
+				title = stringResource(R.string.settings_storage),
 				value = "42.3 MB",
 				onClick = null,
 				showChevron = false
@@ -136,14 +173,14 @@ fun SettingsScreen(
 					.padding(horizontal = Spacing.medium),
 				shape = RoundedCornerShape(Spacing.medium)
 			) {
-				Text("Clear Cache")
+				Text(stringResource(R.string.settings_clear_cache))
 			}
 
 			Spacer(modifier = Modifier.height(Spacing.medium))
 
 			// Privacy Policy
 			SettingItem(
-				title = "Privacy Policy",
+				title = stringResource(R.string.settings_privacy_policy),
 				onClick = onPrivacyPolicyClick,
 				showChevron = true
 			)
@@ -152,7 +189,7 @@ fun SettingsScreen(
 
 			// Terms of Service
 			SettingItem(
-				title = "Terms of Service",
+				title = stringResource(R.string.settings_terms),
 				onClick = onTermsClick,
 				showChevron = true
 			)
@@ -165,7 +202,16 @@ fun SettingsScreen(
 	if (showLanguageDialog) {
 		LanguagePickerDialog(
 			selectedLanguage = selectedLanguage,
-			onLanguageSelected = { selectedLanguage = it },
+			onLanguageSelected = { newLanguage ->
+				selectedLanguage = newLanguage
+				showLanguageDialog = false
+				// Call the callback to actually change the language
+				val languageCode = when (newLanguage) {
+					Language.INDONESIAN -> AppPreferences.LANG_INDONESIAN
+					Language.ENGLISH -> AppPreferences.LANG_ENGLISH
+				}
+				onLanguageChanged(languageCode)
+			},
 			onDismiss = { showLanguageDialog = false }
 		)
 	}
@@ -194,7 +240,7 @@ private fun SettingsHeader(
 		color = MaterialTheme.colorScheme.surface
 	) {
 		Text(
-			text = "Settings",
+			text = stringResource(R.string.settings_title),
 			style = MaterialTheme.typography.headlineSmall.copy(
 				fontSize = 24.sp
 			),
@@ -269,13 +315,20 @@ private fun ThemeSelector(
 					horizontalAlignment = Alignment.CenterHorizontally,
 					verticalArrangement = Arrangement.Center
 				) {
+					val themeLabel = stringResource(
+						when (theme) {
+							ThemeMode.SYSTEM -> R.string.settings_theme_system
+							ThemeMode.LIGHT -> R.string.settings_theme_light
+							ThemeMode.DARK -> R.string.settings_theme_dark
+						}
+					)
 					Icon(
 						imageVector = theme.icon,
-						contentDescription = theme.label,
+						contentDescription = themeLabel,
 						modifier = Modifier.size(Dimensions.iconMedium)
 					)
 					Text(
-						text = theme.label,
+						text = themeLabel,
 						style = MaterialTheme.typography.labelSmall,
 						modifier = Modifier.padding(top = 4.dp)
 					)
@@ -386,19 +439,24 @@ private fun LanguagePickerDialog(
 		onDismissRequest = onDismiss,
 		title = {
 			Text(
-				text = "Select Language",
+				text = stringResource(R.string.dialog_language_title),
 				style = MaterialTheme.typography.titleLarge
 			)
 		},
 		text = {
 			Column {
 				Language.values().forEach { language ->
+					val languageText = stringResource(
+						when (language) {
+							Language.ENGLISH -> R.string.dialog_language_english
+							Language.INDONESIAN -> R.string.dialog_language_indonesian
+						}
+					)
 					Row(
 						modifier = Modifier
 							.fillMaxWidth()
 							.clickable {
 								onLanguageSelected(language)
-								onDismiss()
 							}
 							.padding(vertical = Spacing.small),
 						verticalAlignment = Alignment.CenterVertically
@@ -407,12 +465,11 @@ private fun LanguagePickerDialog(
 							selected = selectedLanguage == language,
 							onClick = {
 								onLanguageSelected(language)
-								onDismiss()
 							}
 						)
 						Spacer(modifier = Modifier.width(Spacing.small))
 						Text(
-							text = language.displayName,
+							text = languageText,
 							style = MaterialTheme.typography.bodyLarge
 						)
 					}
@@ -421,7 +478,7 @@ private fun LanguagePickerDialog(
 		},
 		confirmButton = {
 			TextButton(onClick = onDismiss) {
-				Text("Cancel")
+				Text(stringResource(R.string.dialog_cancel))
 			}
 		}
 	)
@@ -445,22 +502,22 @@ private fun ClearCacheDialog(
 			)
 		},
 		title = {
-			Text(text = "Clear Cache?")
+			Text(text = stringResource(R.string.dialog_clear_cache_title))
 		},
 		text = {
 			Text(
-				text = "This will delete 42.3 MB of cached data. The app may take longer to load next time.",
+				text = stringResource(R.string.dialog_clear_cache_message),
 				style = MaterialTheme.typography.bodyMedium
 			)
 		},
 		confirmButton = {
 			Button(onClick = onConfirm) {
-				Text("Clear")
+				Text(stringResource(R.string.dialog_clear_cache_confirm))
 			}
 		},
 		dismissButton = {
 			TextButton(onClick = onDismiss) {
-				Text("Cancel")
+				Text(stringResource(R.string.dialog_cancel))
 			}
 		}
 	)
@@ -469,22 +526,18 @@ private fun ClearCacheDialog(
 /**
  * Theme mode enum
  */
-enum class ThemeMode(val label: String, val icon: ImageVector) {
-	SYSTEM("System", Icons.Default.Phone),
-	LIGHT("Light", Icons.Default.Settings),
-	DARK("Dark", Icons.Default.Info)
+enum class ThemeMode(val icon: ImageVector) {
+	SYSTEM(Icons.Default.Phone),
+	LIGHT(Icons.Default.Settings),
+	DARK(Icons.Default.Info)
 }
 
 /**
- * Language enum
+ * Language enum - Only English and Indonesian
  */
 enum class Language(val displayName: String, val code: String) {
 	ENGLISH("English", "en"),
-	SPANISH("Spanish", "es"),
-	FRENCH("French", "fr"),
-	GERMAN("German", "de"),
-	ITALIAN("Italian", "it"),
-	PORTUGUESE("Portuguese", "pt")
+	INDONESIAN("Bahasa Indonesia", "in")
 }
 
 // Preview composables

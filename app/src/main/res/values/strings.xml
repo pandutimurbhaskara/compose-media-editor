@@ -1,3 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">compose-media</string>
+    <!-- App Name -->
+    <string name="app_name">Privacy Editor</string>
+
+    <!-- Navigation -->
+    <string name="nav_home">Home</string>
+    <string name="nav_history">History</string>
+    <string name="nav_settings">Setting</string>
+
+    <!-- Home Screen -->
+    <string name="home_title">Privacy Editor</string>
+    <string name="home_photo_editing">Photo Editing</string>
+    <string name="home_video_editing">Video Editing</string>
+    <string name="home_blur_face">Blur Face</string>
+    <string name="home_blur_license">Blur License Plate</string>
+    <string name="home_blur_id">Blur ID Card</string>
+    <string name="home_custom_blur">Custom Blur Area</string>
+
+    <!-- History Screen -->
+    <string name="history_title">Recent Edits</string>
+    <string name="history_filter_all">All</string>
+    <string name="history_filter_drafts">Drafts</string>
+    <string name="history_filter_completed">Completed</string>
+    <string name="history_filter_exported">Exported</string>
+    <string name="history_status_draft">Draft</string>
+    <string name="history_status_completed">Completed</string>
+    <string name="history_status_exported">Exported</string>
+    <string name="history_status_failed">Failed</string>
+    <string name="history_empty_title">No edits yet</string>
+    <string name="history_empty_subtitle">Start editing to see your history here</string>
+    <string name="history_start_editing">Start Editing</string>
+
+    <!-- Settings Screen -->
+    <string name="settings_title">Settings</string>
+    <string name="settings_appearance">Appearance</string>
+    <string name="settings_theme_system">System</string>
+    <string name="settings_theme_light">Light</string>
+    <string name="settings_theme_dark">Dark</string>
+    <string name="settings_language_region">Language &amp; Region</string>
+    <string name="settings_language">Language</string>
+    <string name="settings_about">About</string>
+    <string name="settings_version">Version</string>
+    <string name="settings_storage">Storage Used</string>
+    <string name="settings_clear_cache">Clear Cache</string>
+    <string name="settings_privacy_policy">Privacy Policy</string>
+    <string name="settings_terms">Terms of Service</string>
+
+    <!-- Dialogs -->
+    <string name="dialog_language_title">Select Language</string>
+    <string name="dialog_language_english">English</string>
+    <string name="dialog_language_indonesian">Bahasa Indonesia</string>
+    <string name="dialog_cancel">Cancel</string>
+    <string name="dialog_clear_cache_title">Clear Cache?</string>
+    <string name="dialog_clear_cache_message">This will delete 42.3 MB of cached data. The app may take longer to load next time.</string>
+    <string name="dialog_clear_cache_confirm">Clear</string>
+
+    <!-- Common -->
+    <string name="content_desc_expand">Expand</string>
+    <string name="content_desc_collapse">Collapse</string>
+    <string name="content_desc_open">Open</string>
+    <string name="content_desc_filter">Filter</string>
+    <string name="content_desc_more_options">More options</string>
+    <string name="content_desc_thumbnail">Thumbnail</string>
 </resources>

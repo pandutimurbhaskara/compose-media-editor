@@ -1,9 +1,12 @@
 package com.pandutimurbhaskara.compose_media
 
+import android.content.Context
+import android.content.res.Configuration
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -13,11 +16,14 @@ import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.pandutimurbhaskara.compose_media.ui.navigation.BottomNavBar
 import com.pandutimurbhaskara.compose_media.ui.navigation.NavBarItem
@@ -25,41 +31,87 @@ import com.pandutimurbhaskara.compose_media.ui.screens.HistoryScreen
 import com.pandutimurbhaskara.compose_media.ui.screens.HomeScreen
 import com.pandutimurbhaskara.compose_media.ui.screens.SettingsScreen
 import com.pandutimurbhaskara.compose_media.ui.theme.ComposemediaTheme
+import java.util.Locale
 
 class MainActivity : ComponentActivity() {
+	private lateinit var appPrefs: AppPreferences
+
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
+		appPrefs = AppPreferences(this)
+
+		// Apply saved language
+		setAppLocale(this, appPrefs.getLanguage())
+
 		enableEdgeToEdge()
 		setContent {
-			ComposemediaTheme {
-				ComposemediaApp()
+			val context = LocalContext.current
+			val prefs = remember { AppPreferences(context) }
+
+			// Theme state
+			var themeMode by remember { mutableIntStateOf(prefs.getThemeMode()) }
+
+			// Determine dark theme based on theme mode
+			val darkTheme = when (themeMode) {
+				AppPreferences.THEME_LIGHT -> false
+				AppPreferences.THEME_DARK -> true
+				else -> isSystemInDarkTheme()
+			}
+
+			ComposemediaTheme(darkTheme = darkTheme) {
+				ComposemediaApp(
+					onThemeChanged = { newTheme ->
+						themeMode = newTheme
+						prefs.setThemeMode(newTheme)
+					},
+					onLanguageChanged = { newLanguage ->
+						prefs.setLanguage(newLanguage)
+						setAppLocale(context, newLanguage)
+						// Recreate activity to apply new language
+						recreate()
+					}
+				)
 			}
 		}
+	}
+
+	/**
+	 * Set app locale
+	 */
+	private fun setAppLocale(context: Context, languageCode: String) {
+		val locale = Locale(languageCode)
+		Locale.setDefault(locale)
+
+		val config = Configuration(context.resources.configuration)
+		config.setLocale(locale)
+		context.createConfigurationContext(config)
+		context.resources.updateConfiguration(config, context.resources.displayMetrics)
 	}
 }
 
 @Composable
-fun ComposemediaApp() {
-	// Navigation items
-	val navItems = remember {
-		listOf(
-			NavBarItem(
-				label = "Home",
-				icon = Icons.Default.Home,
-				route = "home"
-			),
-			NavBarItem(
-				label = "History",
-				icon = Icons.Default.DateRange,
-				route = "history"
-			),
-			NavBarItem(
-				label = "Setting",
-				icon = Icons.Default.Settings,
-				route = "settings"
-			)
+fun ComposemediaApp(
+	onThemeChanged: (Int) -> Unit = {},
+	onLanguageChanged: (String) -> Unit = {}
+) {
+	// Navigation items with string resources
+	val navItems = listOf(
+		NavBarItem(
+			label = stringResource(R.string.nav_home),
+			icon = Icons.Default.Home,
+			route = "home"
+		),
+		NavBarItem(
+			label = stringResource(R.string.nav_history),
+			icon = Icons.Default.DateRange,
+			route = "history"
+		),
+		NavBarItem(
+			label = stringResource(R.string.nav_settings),
+			icon = Icons.Default.Settings,
+			route = "settings"
 		)
-	}
+	)
 
 	// Store index instead of the entire NavBarItem (which contains non-saveable ImageVector)
 	var selectedIndex by rememberSaveable { mutableStateOf(0) }
@@ -92,7 +144,9 @@ fun ComposemediaApp() {
 			"settings" -> SettingsScreen(
 				modifier = Modifier
 					.fillMaxSize()
-					.padding(innerPadding)
+					.padding(innerPadding),
+				onThemeChanged = onThemeChanged,
+				onLanguageChanged = onLanguageChanged
 			)
 		}
 	}
