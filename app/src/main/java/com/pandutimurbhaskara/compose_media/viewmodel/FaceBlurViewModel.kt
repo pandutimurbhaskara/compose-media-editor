@@ -12,13 +12,15 @@ import com.pandutimurbhaskara.compose_media.model.DetectedFace
 import com.pandutimurbhaskara.compose_media.model.DetectionSource
 import com.pandutimurbhaskara.compose_media.util.BlurProcessor
 import com.pandutimurbhaskara.compose_media.util.ImageProcessor
+import com.pandutimurbhaskara.compose_media.util.UndoRedoManager
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import java.util.UUID
 
 /**
- * ViewModel for managing face blur editing state
+ * ViewModel for managing face blur editing state with undo/redo support
  */
 class FaceBlurViewModel(
     private val faceDetector: FaceDetectorManager = FaceDetectorManager(),
@@ -32,6 +34,15 @@ class FaceBlurViewModel(
     private var originalBitmap: Bitmap? = null
     private val _detectedFaces = mutableListOf<DetectedFace>()
     private val _blurRegions = mutableListOf<BlurRegion>()
+
+    // Undo/Redo manager for blur regions
+    private val undoRedoManager = UndoRedoManager<List<BlurRegion>>()
+
+    private val _canUndo = MutableStateFlow(false)
+    val canUndo: StateFlow<Boolean> = _canUndo.asStateFlow()
+
+    private val _canRedo = MutableStateFlow(false)
+    val canRedo: StateFlow<Boolean> = _canRedo.asStateFlow()
 
     /**
      * Load image from URI and prepare for editing
@@ -76,6 +87,11 @@ class FaceBlurViewModel(
                     }
                 )
 
+                // Initialize undo/redo with initial state
+                undoRedoManager.clear()
+                undoRedoManager.saveState(_blurRegions.toList())
+                updateUndoRedoState()
+
                 _uiState.value = FaceBlurUiState.FacesDetected(
                     bitmap = bitmap,
                     faces = _detectedFaces,
@@ -91,6 +107,7 @@ class FaceBlurViewModel(
      * Change blur type for a specific region
      */
     fun changeBlurType(regionId: String, blurType: BlurType) {
+        saveStateToHistory()
         val index = _blurRegions.indexOfFirst { it.id == regionId }
         if (index >= 0) {
             _blurRegions[index] = _blurRegions[index].copy(type = blurType)
@@ -102,6 +119,7 @@ class FaceBlurViewModel(
      * Change blur type for all regions at once
      */
     fun changeAllBlurTypes(blurType: BlurType) {
+        saveStateToHistory()
         _blurRegions.forEachIndexed { index, region ->
             _blurRegions[index] = region.copy(type = blurType)
         }
@@ -112,8 +130,80 @@ class FaceBlurViewModel(
      * Remove a specific blur region
      */
     fun removeBlurRegion(regionId: String) {
+        saveStateToHistory()
         _blurRegions.removeIf { it.id == regionId }
         updatePreview()
+    }
+
+    /**
+     * Update a blur region (for manual editing)
+     */
+    fun updateBlurRegion(region: BlurRegion) {
+        saveStateToHistory()
+        val index = _blurRegions.indexOfFirst { it.id == region.id }
+        if (index >= 0) {
+            _blurRegions[index] = region
+        } else {
+            _blurRegions.add(region)
+        }
+        updatePreview()
+    }
+
+    /**
+     * Add a new manual blur region
+     */
+    fun addManualBlurRegion(boundingBox: android.graphics.Rect, blurType: BlurType) {
+        saveStateToHistory()
+        val newRegion = BlurRegion(
+            id = UUID.randomUUID().toString(),
+            boundingBox = boundingBox,
+            type = blurType,
+            source = DetectionSource.MANUAL
+        )
+        _blurRegions.add(newRegion)
+        updatePreview()
+    }
+
+    /**
+     * Undo last action
+     */
+    fun undo() {
+        val previousState = undoRedoManager.undo()
+        if (previousState != null) {
+            _blurRegions.clear()
+            _blurRegions.addAll(previousState)
+            updatePreview()
+            updateUndoRedoState()
+        }
+    }
+
+    /**
+     * Redo last undone action
+     */
+    fun redo() {
+        val nextState = undoRedoManager.redo()
+        if (nextState != null) {
+            _blurRegions.clear()
+            _blurRegions.addAll(nextState)
+            updatePreview()
+            updateUndoRedoState()
+        }
+    }
+
+    /**
+     * Save current state to history
+     */
+    private fun saveStateToHistory() {
+        undoRedoManager.saveState(_blurRegions.toList())
+        updateUndoRedoState()
+    }
+
+    /**
+     * Update undo/redo button states
+     */
+    private fun updateUndoRedoState() {
+        _canUndo.value = undoRedoManager.canUndo()
+        _canRedo.value = undoRedoManager.canRedo()
     }
 
     /**
@@ -152,6 +242,8 @@ class FaceBlurViewModel(
     fun reset() {
         _detectedFaces.clear()
         _blurRegions.clear()
+        undoRedoManager.clear()
+        updateUndoRedoState()
         originalBitmap?.let {
             _uiState.value = FaceBlurUiState.ImageLoaded(it)
         }
