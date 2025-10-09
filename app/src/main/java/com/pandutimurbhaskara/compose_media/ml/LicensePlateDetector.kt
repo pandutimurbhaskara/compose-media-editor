@@ -2,7 +2,6 @@ package com.pandutimurbhaskara.compose_media.ml
 
 import android.graphics.Bitmap
 import android.graphics.Rect
-import com.google.mlkit.vision.common.InputImage
 import com.pandutimurbhaskara.compose_media.model.DetectedText
 import java.util.UUID
 
@@ -77,8 +76,7 @@ class LicensePlateDetector(
      */
     suspend fun detectLicensePlate(bitmap: Bitmap): List<DetectedText> {
         return try {
-            val inputImage = InputImage.fromBitmap(bitmap, 0)
-            val recognizedText = textRecognizer.recognizeText(inputImage)
+            val recognizedText = textRecognizer.recognizeText(bitmap)
 
             val detectedPlates = mutableListOf<DetectedText>()
 
@@ -119,11 +117,15 @@ class LicensePlateDetector(
                             }
 
                             if (notAlreadyDetected) {
+                                // Calculate average confidence from lines in block
+                                val avgConfidence = block.lines.mapNotNull { it.confidence }.average().toFloat()
+                                val confidence = if (avgConfidence.isNaN()) 0.7f else avgConfidence
+
                                 detectedPlates.add(
                                     DetectedText(
                                         text = blockText,
                                         boundingBox = box,
-                                        confidence = block.confidence ?: 0.7f,
+                                        confidence = confidence,
                                         id = UUID.randomUUID().toString()
                                     )
                                 )

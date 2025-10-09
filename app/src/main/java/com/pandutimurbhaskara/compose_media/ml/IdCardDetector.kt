@@ -2,7 +2,6 @@ package com.pandutimurbhaskara.compose_media.ml
 
 import android.graphics.Bitmap
 import android.graphics.Rect
-import com.google.mlkit.vision.common.InputImage
 import com.pandutimurbhaskara.compose_media.model.DetectedText
 import java.util.UUID
 
@@ -89,8 +88,7 @@ class IdCardDetector(
      */
     suspend fun detectIdCard(bitmap: Bitmap): List<DetectedText> {
         return try {
-            val inputImage = InputImage.fromBitmap(bitmap, 0)
-            val recognizedText = textRecognizer.recognizeText(inputImage)
+            val recognizedText = textRecognizer.recognizeText(bitmap)
 
             val detectedTexts = mutableListOf<DetectedText>()
             val allTextBlocks = mutableListOf<String>()

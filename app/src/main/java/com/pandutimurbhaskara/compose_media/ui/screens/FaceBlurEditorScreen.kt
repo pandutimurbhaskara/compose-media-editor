@@ -15,7 +15,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AutoFixHigh
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
@@ -84,7 +84,7 @@ fun FaceBlurEditorScreen(
                         onClick = { viewModel.detectFaces() },
                         enabled = uiState is FaceBlurUiState.ImageLoaded
                     ) {
-                        Icon(Icons.Default.AutoFixHigh, contentDescription = "Auto Detect")
+                        Icon(Icons.Filled.Search, contentDescription = "Auto Detect")
                     }
                 }
             )
