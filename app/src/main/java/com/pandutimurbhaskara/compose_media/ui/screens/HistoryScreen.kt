@@ -68,7 +68,8 @@ fun HistoryScreen(
 	modifier: Modifier = Modifier,
 	onProjectClick: (HistoryProject) -> Unit = {},
 	onMoreOptionsClick: (HistoryProject) -> Unit = {},
-	onStartEditingClick: () -> Unit = {}
+	onStartEditingClick: () -> Unit = {},
+	onNavigateBack: () -> Unit = {}
 ) {
 	// Filter state
 	var selectedFilter by rememberSaveable { mutableStateOf(ProjectFilter.ALL) }

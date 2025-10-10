@@ -61,7 +61,9 @@ import com.pandutimurbhaskara.compose_media.ui.theme.Spacing
 @Composable
 fun HomeScreen(
 	modifier: Modifier = Modifier,
-	onEditingOptionClick: (EditingOption) -> Unit = {}
+	onEditingOptionClick: (String) -> Unit = {},
+	onNavigateToHistory: () -> Unit = {},
+	onNavigateToSettings: () -> Unit = {}
 ) {
 	// Track which accordion is expanded (only one at a time)
 	var expandedAccordion by rememberSaveable { mutableStateOf<String?>(null) }
@@ -131,7 +133,7 @@ private fun EditingAccordion(
 	isExpanded: Boolean,
 	onToggle: () -> Unit,
 	options: List<EditingOption>,
-	onOptionClick: (EditingOption) -> Unit,
+	onOptionClick: (String) -> Unit,
 	modifier: Modifier = Modifier
 ) {
 	// Animated rotation for chevron icon
@@ -203,7 +205,7 @@ private fun EditingAccordion(
 						}
 						EditingOptionItem(
 							option = option,
-							onClick = { onOptionClick(option) }
+							onClick = { onOptionClick(option.id) }
 						)
 					}
 				}

@@ -29,6 +29,13 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import kotlinx.coroutines.launch
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.NavDestination.Companion.hierarchy
+import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
+import com.pandutimurbhaskara.compose_media.navigation.AppNavGraph
+import com.pandutimurbhaskara.compose_media.navigation.Routes
 import com.pandutimurbhaskara.compose_media.ui.navigation.BottomNavBar
 import com.pandutimurbhaskara.compose_media.ui.navigation.NavBarItem
 import com.pandutimurbhaskara.compose_media.ui.screens.HistoryScreen
@@ -98,40 +105,39 @@ fun ComposemediaApp(
 	onThemeChanged: (Int) -> Unit = {},
 	onLanguageChanged: (String) -> Unit = {}
 ) {
+	val navController = rememberNavController()
+	val navBackStackEntry by navController.currentBackStackEntryAsState()
+	val currentDestination = navBackStackEntry?.destination
+
 	// Navigation items with string resources
 	val navItems = listOf(
 		NavBarItem(
 			label = stringResource(R.string.nav_home),
 			icon = Icons.Default.Home,
-			route = "home"
+			route = Routes.HOME
 		),
 		NavBarItem(
 			label = stringResource(R.string.nav_history),
 			icon = Icons.Default.DateRange,
-			route = "history"
+			route = Routes.HISTORY
 		),
 		NavBarItem(
 			label = stringResource(R.string.nav_settings),
 			icon = Icons.Default.Settings,
-			route = "settings"
+			route = Routes.SETTINGS
 		)
 	)
 
-	// Store index instead of the entire NavBarItem (which contains non-saveable ImageVector)
-	var selectedIndex by rememberSaveable { mutableStateOf(0) }
-	val selectedItem = navItems[selectedIndex]
+	// Determine if bottom bar should be shown
+	val showBottomBar = currentDestination?.route in listOf(
+		Routes.HOME,
+		Routes.HISTORY,
+		Routes.SETTINGS
+	)
 
 	// Snackbar state
 	val snackbarHostState = remember { SnackbarHostState() }
 	val scope = rememberCoroutineScope()
-
-	// Navigation helper function
-	val navigateToTab = { route: String ->
-		val index = navItems.indexOfFirst { it.route == route }
-		if (index >= 0) {
-			selectedIndex = index
-		}
-	}
 
 	// Show snackbar helper function
 	val showSnackbar: (String) -> Unit = { message ->
@@ -147,57 +153,35 @@ fun ComposemediaApp(
 			SnackbarHost(hostState = snackbarHostState)
 		},
 		bottomBar = {
-			BottomNavBar(
-				items = navItems,
-				selectedItem = selectedItem,
-				onItemSelected = { item ->
-					selectedIndex = navItems.indexOf(item)
-				}
-			)
-		}
-	) { innerPadding ->
-		// Screen content based on selected item
-		when (selectedItem.route) {
-			"home" -> {
-				val context = LocalContext.current
-				HomeScreen(
-					modifier = Modifier
-						.fillMaxSize()
-						.padding(innerPadding),
-					onEditingOptionClick = { option ->
-						// Show snackbar with option label
-						val message = context.getString(
-							when (option.type) {
-								com.pandutimurbhaskara.compose_media.ui.screens.EditingType.PHOTO ->
-									R.string.snackbar_opening_photo_editor
-								com.pandutimurbhaskara.compose_media.ui.screens.EditingType.VIDEO ->
-									R.string.snackbar_opening_video_editor
+			if (showBottomBar) {
+				BottomNavBar(
+					items = navItems,
+					selectedItem = navItems.find { item ->
+						currentDestination?.hierarchy?.any { it.route == item.route } == true
+					} ?: navItems[0],
+					onItemSelected = { item ->
+						navController.navigate(item.route) {
+							// Pop up to the start destination of the graph to
+							// avoid building up a large stack of destinations
+							popUpTo(navController.graph.findStartDestination().id) {
+								saveState = true
 							}
-						)
-						showSnackbar(message)
-						// Navigate to history after a short delay
-						navigateToTab("history")
+							// Avoid multiple copies of the same destination when
+							// reselecting the same item
+							launchSingleTop = true
+							// Restore state when reselecting a previously selected item
+							restoreState = true
+						}
 					}
 				)
 			}
-			"history" -> HistoryScreen(
-				modifier = Modifier
-					.fillMaxSize()
-					.padding(innerPadding),
-				onStartEditingClick = {
-					// Navigate to home when start editing is clicked
-					navigateToTab("home")
-				}
-			)
-			"settings" -> SettingsScreen(
-				modifier = Modifier
-					.fillMaxSize()
-					.padding(innerPadding),
-				onThemeChanged = onThemeChanged,
-				onLanguageChanged = onLanguageChanged,
-				onShowSnackbar = showSnackbar
-			)
 		}
+	) { innerPadding ->
+		// Navigation graph handles its own padding per screen
+		AppNavGraph(
+			navController = navController,
+			startDestination = Routes.HOME
+		)
 	}
 }
 

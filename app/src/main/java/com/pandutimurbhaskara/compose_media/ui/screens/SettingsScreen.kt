@@ -68,7 +68,8 @@ fun SettingsScreen(
 	onLanguageChanged: (String) -> Unit = {},
 	onPrivacyPolicyClick: () -> Unit = {},
 	onTermsClick: () -> Unit = {},
-	onShowSnackbar: (String) -> Unit = {}
+	onShowSnackbar: (String) -> Unit = {},
+	onNavigateBack: () -> Unit = {}
 ) {
 	val context = LocalContext.current
 	val prefs = remember { AppPreferences(context) }
